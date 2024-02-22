@@ -10,7 +10,9 @@ import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Optional;
 
@@ -31,7 +33,7 @@ public class ProductController {
     @SuppressWarnings("rawtypes")
     @GetMapping("/")
     public ResponseEntity getMethodName() {
-        var allProducts = repository.findAll();
+        var allProducts = repository.findAllByActiveTrue();
         return ResponseEntity.ok(allProducts);
     }
 
@@ -50,6 +52,7 @@ public class ProductController {
         Optional<Product> optionalProduct = repository.findById(data.id());
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
+            System.out.println(data.id() + " " + product);
             product.setName(data.name());
             product.setPrice(data.price());
             return ResponseEntity.ok(product);
@@ -58,18 +61,33 @@ public class ProductController {
     }
 
 
-    @SuppressWarnings({ "rawtypes", "null" })
-    @PostMapping("/delete")
-    public ResponseEntity deleteProduct(@RequestBody @Valid RequestProduct data) {
-        Optional<Product> optionalProduct = repository.findById(data.id());
+    @SuppressWarnings({ "null", "rawtypes" })
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity deleteProduto(@PathVariable String id ){
+        Optional<Product> optionalProduct = repository.findById(id);
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
-            repository.delete(product);
-
-            return ResponseEntity.ok("apagado");
+            System.out.println(id + " " + product);
+            product.setActive(false);
+            return ResponseEntity.noContent().build();
         }
-
-        
-        return ResponseEntity.ok("nao apagado");
+        return ResponseEntity.noContent().build();
     }
+
+
+    ///@SuppressWarnings({ "rawtypes", "null" })
+   // @PostMapping("/delete")
+   // public ResponseEntity deleteProduct(@RequestBody @Valid RequestProduct data) {
+   //     Optional<Product> optionalProduct = repository.findById(data.id());
+   //     if (optionalProduct.isPresent()) {
+    //        Product product = optionalProduct.get();
+    //        repository.delete(product);
+//
+     //       return ResponseEntity.ok("apagado");
+    //    }
+
+    //    
+    //    return ResponseEntity.ok("nao apagado");
+   // }
 }

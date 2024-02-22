@@ -27,9 +27,11 @@ public class Product{
 
     private Integer price;
 
+    private Boolean active;
 
     public Product(RequestProduct requestProduct){
         this.name = requestProduct.name();
         this.price = requestProduct.price();
+        this.active = true;
     }
 }
