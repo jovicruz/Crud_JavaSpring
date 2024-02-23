@@ -20,6 +20,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Product{
     
+    //ID é gerado automaticamente
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
@@ -32,6 +33,7 @@ public class Product{
     public Product(RequestProduct requestProduct){
         this.name = requestProduct.name();
         this.price = requestProduct.price();
+        //Todos os novos produtos cadastrados são automaticamente ativos
         this.active = true;
     }
 }

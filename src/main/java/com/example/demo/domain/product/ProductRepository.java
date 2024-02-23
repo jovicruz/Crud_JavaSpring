@@ -5,5 +5,6 @@ import java.util.List;
 
 
 public interface ProductRepository extends JpaRepository<Product, String> {
+    //Metodo que filtra todos os produtos marcados como ativo
     List<Product> findAllByActiveTrue();
 }

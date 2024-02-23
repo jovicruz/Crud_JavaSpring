@@ -5,11 +5,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.domain.product.Product;
 import com.example.demo.domain.product.ProductRepository;
 import com.example.demo.domain.product.RequestProduct;
+import com.example.demo.domain.product.ValidationGroups.PostValidation;
+import com.example.demo.domain.product.ValidationGroups.PutValidation;
 
-import jakarta.validation.Valid;
+import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +33,7 @@ public class ProductController {
     @Autowired
     private ProductRepository repository;
 
-
+    //GET retorna todos os produtos ativos
     @SuppressWarnings("rawtypes")
     @GetMapping("/")
     public ResponseEntity getMethodName() {
@@ -37,18 +41,20 @@ public class ProductController {
         return ResponseEntity.ok(allProducts);
     }
 
+    //Cadastra novo Produto
     @SuppressWarnings("rawtypes")
     @PostMapping("/")
-    public ResponseEntity registerProduct(@RequestBody @Valid RequestProduct data) {
+    public ResponseEntity registerProduct(@Validated(PostValidation.class) @RequestBody RequestProduct data) {
         Product newProduct = new Product(data);
         repository.save(newProduct);
         return ResponseEntity.ok().build();
     }
     
+    //Atualiza o Produto
     @SuppressWarnings({ "rawtypes", "null" })
     @Transactional
     @PutMapping("/")
-    public ResponseEntity updateProduto(@RequestBody @Valid RequestProduct data) {
+    public ResponseEntity updateProduto(@Validated(PutValidation.class) @RequestBody RequestProduct data) {
         Optional<Product> optionalProduct = repository.findById(data.id());
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
@@ -57,10 +63,10 @@ public class ProductController {
             product.setPrice(data.price());
             return ResponseEntity.ok(product);
         }
-        return ResponseEntity.ok().build();
+        throw new EntityNotFoundException();
     }
 
-
+    //Torna o produto inativo
     @SuppressWarnings({ "null", "rawtypes" })
     @DeleteMapping("/{id}")
     @Transactional
@@ -72,11 +78,11 @@ public class ProductController {
             product.setActive(false);
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.noContent().build();
+        throw new EntityNotFoundException();
     }
 
-
-    ///@SuppressWarnings({ "rawtypes", "null" })
+    //Codigo antigo que apagava permanentemente o produto
+    //@SuppressWarnings({ "rawtypes", "null" })
    // @PostMapping("/delete")
    // public ResponseEntity deleteProduct(@RequestBody @Valid RequestProduct data) {
    //     Optional<Product> optionalProduct = repository.findById(data.id());
